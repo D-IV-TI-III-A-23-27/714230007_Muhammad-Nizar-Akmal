@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ilustrasi interaktif arsitektur Reinforcement Learning - Agent, Environment, State, Action, Reward">
+    <title>Arsitektur Reinforcement Learning | Muhammad Nizar Akmal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Particle Background -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Header -->
+    <header class="hero">
+        <div class="hero-badge">🤖 Artificial Intelligence</div>
+        <h1 class="hero-title">Reinforcement <span class="gradient-text">Learning</span></h1>
+        <p class="hero-subtitle">Ilustrasi Interaktif Arsitektur AI — Agent belajar dari interaksi dengan lingkungan melalui reward & penalty</p>
+        <div class="hero-meta">
+            <span>714230007</span>
+            <span class="dot">•</span>
+            <span>Muhammad Nizar Akmal</span>
+            <span class="dot">•</span>
+            <span>D-IV TI III A</span>
+        </div>
+    </header>
+
+    <!-- Main RL Loop Diagram -->
+    <section class="section">
+        <h2 class="section-title">Siklus Utama <span class="gradient-text">RL</span></h2>
+        <p class="section-desc">Klik setiap komponen untuk melihat penjelasan detail</p>
+
+        <div class="rl-diagram" id="rlDiagram">
+            <!-- Agent Node -->
+            <div class="node agent-node" id="nodeAgent" data-info="agent">
+                <div class="node-icon">🧠</div>
+                <div class="node-label">Agent</div>
+                <div class="node-pulse"></div>
+            </div>
+
+            <!-- Action Arrow -->
+            <div class="arrow arrow-action" id="arrowAction">
+                <svg viewBox="0 0 200 60" class="arrow-svg">
+                    <defs>
+                        <linearGradient id="gradAction" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#6366f1"/>
+                            <stop offset="100%" style="stop-color:#06b6d4"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M10,30 L170,30" stroke="url(#gradAction)" stroke-width="3" fill="none" stroke-dasharray="8,4" class="arrow-path"/>
+                    <polygon points="175,30 160,20 160,40" fill="#06b6d4" class="arrow-head"/>
+                </svg>
+                <span class="arrow-label">Action (aₜ)</span>
+            </div>
+
+            <!-- Environment Node -->
+            <div class="node env-node" id="nodeEnv" data-info="environment">
+                <div class="node-icon">🌍</div>
+                <div class="node-label">Environment</div>
+                <div class="node-pulse"></div>
+            </div>
+
+            <!-- Reward Arrow (bottom-right) -->
+            <div class="arrow arrow-reward" id="arrowReward">
+                <svg viewBox="0 0 60 140" class="arrow-svg-v">
+                    <defs>
+                        <linearGradient id="gradReward" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#10b981"/>
+                            <stop offset="100%" style="stop-color:#f59e0b"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M30,10 L30,110" stroke="url(#gradReward)" stroke-width="3" fill="none" stroke-dasharray="8,4" class="arrow-path"/>
+                    <polygon points="30,120 20,105 40,105" fill="#f59e0b" class="arrow-head"/>
+                </svg>
+                <span class="arrow-label-v">Reward (rₜ)</span>
+            </div>
+
+            <!-- State+Reward Box -->
+            <div class="node reward-node" id="nodeReward" data-info="reward">
+                <div class="node-icon">⭐</div>
+                <div class="node-label">State + Reward</div>
+                <div class="node-pulse"></div>
+            </div>
+
+            <!-- State Arrow (bottom-left) -->
+            <div class="arrow arrow-state" id="arrowState">
+                <svg viewBox="0 0 200 60" class="arrow-svg">
+                    <defs>
+                        <linearGradient id="gradState" x1="100%" y1="0%" x2="0%" y2="0%">
+                            <stop offset="0%" style="stop-color:#f59e0b"/>
+                            <stop offset="100%" style="stop-color:#ef4444"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M190,30 L30,30" stroke="url(#gradState)" stroke-width="3" fill="none" stroke-dasharray="8,4" class="arrow-path"/>
+                    <polygon points="25,30 40,20 40,40" fill="#ef4444" class="arrow-head"/>
+                </svg>
+                <span class="arrow-label">State (sₜ₊₁)</span>
+            </div>
+
+            <!-- Policy Node -->
+            <div class="node policy-node" id="nodePolicy" data-info="policy">
+                <div class="node-icon">📋</div>
+                <div class="node-label">Policy (π)</div>
+                <div class="node-pulse"></div>
+            </div>
+
+            <!-- Animated data particles -->
+            <div class="data-particle dp1"></div>
+            <div class="data-particle dp2"></div>
+            <div class="data-particle dp3"></div>
+        </div>
+    </section>
+
+    <!-- Info Panel -->
+    <div class="info-panel" id="infoPanel">
+        <button class="info-close" id="infoClose">&times;</button>
+        <div class="info-content" id="infoContent"></div>
+    </div>
+
+    <!-- Component Cards -->
+    <section class="section">
+        <h2 class="section-title">Komponen <span class="gradient-text">Utama</span></h2>
+        <div class="cards-grid">
+            <div class="card" data-aos="fade-up">
+                <div class="card-icon">🧠</div>
+                <h3>Agent</h3>
+                <p>Entitas yang mengambil keputusan. Agent mengobservasi state, memilih action berdasarkan policy, dan belajar dari reward yang diterima.</p>
+                <div class="card-tag">Decision Maker</div>
+            </div>
+            <div class="card" data-aos="fade-up">
+                <div class="card-icon">🌍</div>
+                <h3>Environment</h3>
+                <p>Dunia tempat agent berinteraksi. Environment menerima action dari agent dan menghasilkan state baru beserta reward.</p>
+                <div class="card-tag">World Model</div>
+            </div>
+            <div class="card" data-aos="fade-up">
+                <div class="card-icon">📊</div>
+                <h3>State (sₜ)</h3>
+                <p>Representasi kondisi environment pada waktu t. State memberikan informasi yang dibutuhkan agent untuk mengambil keputusan.</p>
+                <div class="card-tag">Observation</div>
+            </div>
+            <div class="card" data-aos="fade-up">
+                <div class="card-icon">🎯</div>
+                <h3>Action (aₜ)</h3>
+                <p>Tindakan yang dipilih agent berdasarkan policy. Action mempengaruhi environment dan mengubah state selanjutnya.</p>
+                <div class="card-tag">Decision</div>
+            </div>
+            <div class="card" data-aos="fade-up">
+                <div class="card-icon">⭐</div>
+                <h3>Reward (rₜ)</h3>
+                <p>Sinyal feedback dari environment. Reward positif mendorong agent mengulangi action, reward negatif mendorong agent menghindarinya.</p>
+                <div class="card-tag">Feedback Signal</div>
+            </div>
+            <div class="card" data-aos="fade-up">
+                <div class="card-icon">📋</div>
+                <h3>Policy (π)</h3>
+                <p>Strategi agent dalam memilih action. Policy memetakan state ke action, bisa deterministik atau stokastik (probabilistik).</p>
+                <div class="card-tag">Strategy</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Algorithm Types -->
+    <section class="section">
+        <h2 class="section-title">Jenis <span class="gradient-text">Algoritma</span> RL</h2>
+        <div class="algo-grid">
+            <div class="algo-card model-free">
+                <div class="algo-header">
+                    <span class="algo-badge">Model-Free</span>
+                </div>
+                <h3>Tanpa Model Environment</h3>
+                <p>Agent belajar langsung dari pengalaman tanpa membangun model internal dari environment.</p>
+                <div class="algo-list">
+                    <div class="algo-item">
+                        <span class="algo-dot q"></span>
+                        <div>
+                            <strong>Q-Learning</strong>
+                            <small>Off-policy, value-based</small>
+                        </div>
+                    </div>
+                    <div class="algo-item">
+                        <span class="algo-dot sarsa"></span>
+                        <div>
+                            <strong>SARSA</strong>
+                            <small>On-policy, value-based</small>
+                        </div>
+                    </div>
+                    <div class="algo-item">
+                        <span class="algo-dot pg"></span>
+                        <div>
+                            <strong>Policy Gradient</strong>
+                            <small>On-policy, policy-based</small>
+                        </div>
+                    </div>
+                    <div class="algo-item">
+                        <span class="algo-dot dqn"></span>
+                        <div>
+                            <strong>DQN (Deep Q-Network)</strong>
+                            <small>Deep RL, value-based</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="algo-card model-based">
+                <div class="algo-header">
+                    <span class="algo-badge badge-green">Model-Based</span>
+                </div>
+                <h3>Dengan Model Environment</h3>
+                <p>Agent membangun model internal environment untuk perencanaan dan simulasi sebelum bertindak.</p>
+                <div class="algo-list">
+                    <div class="algo-item">
+                        <span class="algo-dot dyna"></span>
+                        <div>
+                            <strong>Dyna-Q</strong>
+                            <small>Planning + Learning</small>
+                        </div>
+                    </div>
+                    <div class="algo-item">
+                        <span class="algo-dot mcts"></span>
+                        <div>
+                            <strong>MCTS</strong>
+                            <small>Monte Carlo Tree Search</small>
+                        </div>
+                    </div>
+                    <div class="algo-item">
+                        <span class="algo-dot mbpo"></span>
+                        <div>
+                            <strong>MBPO</strong>
+                            <small>Model-Based Policy Optimization</small>
+                        </div>
+                    </div>
+                    <div class="algo-item">
+                        <span class="algo-dot world"></span>
+                        <div>
+                            <strong>World Models</strong>
+                            <small>Learned Environment Model</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Step-by-Step Process -->
+    <section class="section">
+        <h2 class="section-title">Proses <span class="gradient-text">Langkah demi Langkah</span></h2>
+        <p class="section-desc">Bagaimana Reinforcement Learning bekerja dari awal hingga agent menjadi optimal</p>
+
+        <div class="timeline">
+            <div class="timeline-item" data-step="1">
+                <div class="timeline-marker">
+                    <span class="timeline-num">1</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-icon">🎬</div>
+                    <h3>Inisialisasi</h3>
+                    <p>Agent dimulai tanpa pengetahuan apapun. Q-table (atau neural network) diinisialisasi dengan nilai nol atau random. Environment disiapkan pada state awal.</p>
+                    <div class="timeline-detail">
+                        <code>Q(s, a) = 0  ∀s ∈ S, a ∈ A</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item" data-step="2">
+                <div class="timeline-marker">
+                    <span class="timeline-num">2</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-icon">👀</div>
+                    <h3>Observasi State</h3>
+                    <p>Agent mengobservasi state saat ini dari environment. State bisa berupa posisi, pixel gambar, sensor readings, atau representasi lainnya.</p>
+                    <div class="timeline-detail">
+                        <code>sₜ = observe(environment)</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item" data-step="3">
+                <div class="timeline-marker">
+                    <span class="timeline-num">3</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-icon">🤔</div>
+                    <h3>Pilih Action (Exploration vs Exploitation)</h3>
+                    <p>Agent memilih action menggunakan policy. Di awal, agent lebih banyak <strong>eksplorasi</strong> (mencoba random). Seiring belajar, agent lebih banyak <strong>eksploitasi</strong> (memilih action terbaik).</p>
+                    <div class="timeline-detail">
+                        <code>aₜ = π(sₜ)  // ε-greedy: random jika rand() &lt; ε</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item" data-step="4">
+                <div class="timeline-marker">
+                    <span class="timeline-num">4</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-icon">⚡</div>
+                    <h3>Eksekusi Action</h3>
+                    <p>Action yang dipilih dikirim ke environment. Environment memproses action dan menghasilkan transisi ke state baru.</p>
+                    <div class="timeline-detail">
+                        <code>environment.step(aₜ) → (sₜ₊₁, rₜ, done)</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item" data-step="5">
+                <div class="timeline-marker">
+                    <span class="timeline-num">5</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-icon">🎁</div>
+                    <h3>Terima Reward & State Baru</h3>
+                    <p>Environment memberikan reward numerik dan state baru. Reward menunjukkan seberapa baik atau buruk action yang dipilih.</p>
+                    <div class="timeline-detail">
+                        <code>rₜ = R(sₜ, aₜ, sₜ₊₁)</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item" data-step="6">
+                <div class="timeline-marker">
+                    <span class="timeline-num">6</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-icon">📈</div>
+                    <h3>Update Policy / Q-Value</h3>
+                    <p>Agent memperbarui pengetahuannya berdasarkan pengalaman (state, action, reward, next_state). Ini adalah inti dari proses learning.</p>
+                    <div class="timeline-detail">
+                        <code>Q(s,a) ← Q(s,a) + α[r + γ·maxQ(s',a') - Q(s,a)]</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item" data-step="7">
+                <div class="timeline-marker">
+                    <span class="timeline-num">7</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-icon">🔁</div>
+                    <h3>Ulangi (Iterasi)</h3>
+                    <p>Proses diulangi dari langkah 2. Setiap iterasi disebut satu <strong>timestep</strong>. Satu kumpulan timestep hingga terminal state disebut satu <strong>episode</strong>. Agent belajar dari ratusan hingga jutaan episode.</p>
+                    <div class="timeline-detail">
+                        <code>for episode in range(N): while not done: ...</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item" data-step="✓">
+                <div class="timeline-marker marker-done">
+                    <span class="timeline-num">✓</span>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-icon">🏆</div>
+                    <h3>Konvergensi — Policy Optimal</h3>
+                    <p>Setelah cukup banyak episode, Q-values konvergen dan agent menemukan <strong>policy optimal (π*)</strong> yang memaksimalkan expected cumulative reward.</p>
+                    <div class="timeline-detail">
+                        <code>π*(s) = argmax_a Q*(s, a)</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Animated RL Visualization -->
+    <section class="section">
+        <h2 class="section-title">Visualisasi <span class="gradient-text">RL Process</span></h2>
+        <p class="section-desc">Animasi interaktif: Lihat agent belajar secara real-time</p>
+        <div class="viz-container">
+            <canvas id="rlVizCanvas" width="700" height="400"></canvas>
+            <div class="viz-controls">
+                <div class="viz-status">
+                    <div class="viz-indicator">
+                        <div class="viz-dot" id="vizDot"></div>
+                        <span id="vizStatusText">Siap</span>
+                    </div>
+                    <div class="viz-ep">Episode: <strong id="vizEp">0</strong></div>
+                </div>
+                <div class="viz-buttons">
+                    <button class="btn btn-primary" id="btnVizStart">▶ Mulai Visualisasi</button>
+                    <button class="btn btn-outline" id="btnVizReset">🔄 Reset</button>
+                </div>
+                <div class="viz-legend-row">
+                    <div class="viz-legend-item"><span class="vl-box" style="background:#6366f1"></span> Agent Path</div>
+                    <div class="viz-legend-item"><span class="vl-box" style="background:#10b981"></span> Goal</div>
+                    <div class="viz-legend-item"><span class="vl-box" style="background:#ef4444"></span> Penalty Zone</div>
+                    <div class="viz-legend-item"><span class="vl-box" style="background:rgba(99,102,241,0.15)"></span> Explored</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pros & Cons -->
+    <section class="section">
+        <h2 class="section-title">Kelebihan & <span class="gradient-text">Kekurangan</span></h2>
+        <p class="section-desc">Evaluasi kapan sebaiknya menggunakan Reinforcement Learning</p>
+
+        <div class="proscons-grid">
+            <div class="proscons-card pros-card">
+                <div class="proscons-header pros-header">
+                    <span class="proscons-icon">✅</span>
+                    <h3>Kelebihan</h3>
+                </div>
+                <ul class="proscons-list">
+                    <li>
+                        <div class="pc-title">Belajar Tanpa Label Data</div>
+                        <div class="pc-desc">Tidak memerlukan dataset berlabel seperti supervised learning. Agent belajar dari interaksi langsung dengan environment.</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Adaptif & Dinamis</div>
+                        <div class="pc-desc">Mampu beradaptasi dengan environment yang berubah-ubah. Agent terus belajar dan menyesuaikan strategi.</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Solusi untuk Masalah Sekuensial</div>
+                        <div class="pc-desc">Sangat cocok untuk decision-making bertahap seperti game, robotics, trading, dan navigasi otonom.</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Menemukan Strategi Non-Obvious</div>
+                        <div class="pc-desc">Dapat menemukan strategi yang tidak terpikirkan oleh manusia, seperti AlphaGo yang mengalahkan juara dunia Go.</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Generalisasi Antar Environment</div>
+                        <div class="pc-desc">Dengan deep RL, agent bisa digeneralisasi ke environment yang serupa tanpa retraining dari awal.</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Optimasi Jangka Panjang</div>
+                        <div class="pc-desc">Memperhitungkan reward kumulatif jangka panjang, bukan hanya keuntungan sesaat (delayed reward).</div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="proscons-card cons-card">
+                <div class="proscons-header cons-header">
+                    <span class="proscons-icon">⚠️</span>
+                    <h3>Kekurangan</h3>
+                </div>
+                <ul class="proscons-list">
+                    <li>
+                        <div class="pc-title">Training Sangat Lambat</div>
+                        <div class="pc-desc">Memerlukan jutaan episode untuk konvergen. Training bisa memakan waktu berhari-hari hingga berminggu-minggu.</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Desain Reward Sulit</div>
+                        <div class="pc-desc">Reward function harus dirancang dengan hati-hati. Reward yang salah bisa menyebabkan perilaku tidak diinginkan (reward hacking).</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Curse of Dimensionality</div>
+                        <div class="pc-desc">State dan action space yang besar membuat eksplorasi menjadi sangat mahal secara komputasi.</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Tidak Stabil</div>
+                        <div class="pc-desc">Terutama deep RL, training bisa sangat tidak stabil. Performa bisa drop tiba-tiba setelah improvement.</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Sulit Diterapkan di Dunia Nyata</div>
+                        <div class="pc-desc">Explorasi random di dunia nyata bisa berbahaya (robot jatuh, mobil menabrak). Perlu simulator yang akurat.</div>
+                    </li>
+                    <li>
+                        <div class="pc-title">Sample Inefficiency</div>
+                        <div class="pc-desc">Membutuhkan sangat banyak data interaksi dibanding metode lain. Setiap sample mahal untuk didapatkan.</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Use Cases -->
+        <h3 class="usecase-title">Contoh Penerapan <span class="gradient-text">RL</span> di Dunia Nyata</h3>
+        <div class="usecase-grid">
+            <div class="usecase-item">
+                <span class="usecase-emoji">🎮</span>
+                <strong>Game AI</strong>
+                <small>AlphaGo, OpenAI Five, Atari</small>
+            </div>
+            <div class="usecase-item">
+                <span class="usecase-emoji">🚗</span>
+                <strong>Self-Driving</strong>
+                <small>Navigasi & keputusan berkendara</small>
+            </div>
+            <div class="usecase-item">
+                <span class="usecase-emoji">🤖</span>
+                <strong>Robotics</strong>
+                <small>Manipulasi objek, berjalan</small>
+            </div>
+            <div class="usecase-item">
+                <span class="usecase-emoji">📈</span>
+                <strong>Trading</strong>
+                <small>Optimasi portfolio otomatis</small>
+            </div>
+            <div class="usecase-item">
+                <span class="usecase-emoji">💬</span>
+                <strong>NLP / ChatBot</strong>
+                <small>RLHF untuk fine-tuning LLM</small>
+            </div>
+            <div class="usecase-item">
+                <span class="usecase-emoji">🏭</span>
+                <strong>Industri</strong>
+                <small>Optimasi energi & manufaktur</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Q-Learning Interactive Demo -->
+    <section class="section">
+        <h2 class="section-title">Demo <span class="gradient-text">Q-Learning</span></h2>
+        <p class="section-desc">Lihat bagaimana agent menemukan jalur optimal di grid world</p>
+        <div class="demo-container">
+            <div class="grid-world" id="gridWorld"></div>
+            <div class="demo-controls">
+                <div class="demo-info">
+                    <div class="demo-stat">
+                        <span class="stat-label">Episode</span>
+                        <span class="stat-value" id="episodeCount">0</span>
+                    </div>
+                    <div class="demo-stat">
+                        <span class="stat-label">Total Reward</span>
+                        <span class="stat-value" id="totalReward">0</span>
+                    </div>
+                    <div class="demo-stat">
+                        <span class="stat-label">Steps</span>
+                        <span class="stat-value" id="stepCount">0</span>
+                    </div>
+                </div>
+                <div class="demo-legend">
+                    <div class="legend-item"><span class="legend-color" style="background:#6366f1"></span> Agent</div>
+                    <div class="legend-item"><span class="legend-color" style="background:#10b981"></span> Goal (+10)</div>
+                    <div class="legend-item"><span class="legend-color" style="background:#ef4444"></span> Obstacle (-5)</div>
+                    <div class="legend-item"><span class="legend-color" style="background:#1e1b4b"></span> Wall</div>
+                </div>
+                <div class="demo-buttons">
+                    <button class="btn btn-primary" id="btnTrain">▶ Train 100 Episodes</button>
+                    <button class="btn btn-secondary" id="btnStep">⏭ Step</button>
+                    <button class="btn btn-outline" id="btnReset">🔄 Reset</button>
+                </div>
+                <div class="q-table-mini">
+                    <h4>Q-Table (State saat ini)</h4>
+                    <div class="q-values" id="qValues">
+                        <div class="q-val"><span>↑</span><span id="qUp">0.00</span></div>
+                        <div class="q-val"><span>↓</span><span id="qDown">0.00</span></div>
+                        <div class="q-val"><span>←</span><span id="qLeft">0.00</span></div>
+                        <div class="q-val"><span>→</span><span id="qRight">0.00</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bellman Equation -->
+    <section class="section">
+        <h2 class="section-title">Persamaan <span class="gradient-text">Bellman</span></h2>
+        <div class="equation-card">
+            <div class="equation">
+                Q(s, a) ← Q(s, a) + α [ r + γ · max<sub>a'</sub> Q(s', a') − Q(s, a) ]
+            </div>
+            <div class="equation-parts">
+                <div class="eq-part">
+                    <span class="eq-symbol" style="color:#6366f1">α</span>
+                    <span class="eq-name">Learning Rate</span>
+                    <span class="eq-desc">Seberapa cepat agent belajar</span>
+                </div>
+                <div class="eq-part">
+                    <span class="eq-symbol" style="color:#10b981">γ</span>
+                    <span class="eq-name">Discount Factor</span>
+                    <span class="eq-desc">Bobot reward masa depan</span>
+                </div>
+                <div class="eq-part">
+                    <span class="eq-symbol" style="color:#f59e0b">r</span>
+                    <span class="eq-name">Reward</span>
+                    <span class="eq-desc">Sinyal feedback langsung</span>
+                </div>
+                <div class="eq-part">
+                    <span class="eq-symbol" style="color:#ef4444">max Q</span>
+                    <span class="eq-name">Max Future Q</span>
+                    <span class="eq-desc">Estimasi reward optimal masa depan</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Muhammad Nizar Akmal — 714230007 — D-IV Teknologi Informasi</p>
+        <p class="footer-sub">Tugas AI: Ilustrasi Arsitektur Reinforcement Learning</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
